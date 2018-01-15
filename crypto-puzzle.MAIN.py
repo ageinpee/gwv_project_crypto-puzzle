@@ -54,12 +54,13 @@ content = filter_operations(content)
 
 # creates a dictionary of the variables in the puzzle so that every variable is a key in the dictionary
 # underscore lines ('_') are removed from the dict
+# this dictionary can be used to save the possible solutions for a puzzle. If there are more than one solution they can be added to the list
 def create_vars(con):
     var_dict = {}
     for x in con:
         for y in x:
             if y not in var_dict.keys():
-                var_dict[y] = 0
+                var_dict[y] = []
     var_dict.pop('_', None)
     return var_dict
 
@@ -92,7 +93,7 @@ global_vv = create_vertical_vars(vv_content)
 
 
 # printing global variables
-print(global_oo)
-print(global_vd)
-print(global_vv)
-print(content)
+print(global_oo)  # oo = operation order
+print(global_vd)  # vd = variable dictionary
+print(global_vv)  # vv = vertical variables --> represents the variables in vertical alignment
+print(content)  # filtered content, at the moment includes just the variables as well as one list/line of underscores '_'
