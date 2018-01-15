@@ -1,3 +1,4 @@
+import copy
 # Exercise 11.3: Cryptoarithmetical Puzzle
 # opening a text file with exactly one crypto-puzzle in it
 with open("crypto-puzzle-data.txt", encoding="utf-8") as f:
@@ -68,23 +69,30 @@ global_vd = create_vars(content)
 
 
 # creating a list of lists with all the vertical alignments in the equation
-#def create_vertical_vars(con):
-#    vertical_vars = []
-#    flag = False
-#    for x in con:
-#        if len(x) < len(max(con,key=len)):
-#            for i in range(0, len(max(con,key=len))-len(x)):
-#                if flag == False:
-#                    vertical_vars.append([x[' ']])
-#                if flag == True:
-#                    vertical_vars[].append()
-#        for i in range(len(x)-1, 0):
-#            if flag == False:
-#                vertical_vars.append([x[i]])
+# uses the pop() function to get the last element of every sublist. If a list is empty ' ' is added instead
+# first element is the right-most alignment
+def create_vertical_vars(con):
+    vertical_vars = []
+    count = 0
+    for i in range(len(max(con, key=len))):
+        vertical_vars.append([])
+        for x in con:
+            if not x:
+                vertical_vars[count].append(' ')
+            else:
+                vertical_vars[count].append(x.pop())
+        count += 1
+    return vertical_vars
 
+
+# copying the values of content to another variable to keep the data after getting the vertical alignments
+vv_content = copy.deepcopy(content)
+# creating a list of lists of the vertical alignments in the equation
+global_vv = create_vertical_vars(vv_content)
 
 
 # printing global variables
 print(global_oo)
 print(global_vd)
+print(global_vv)
 print(content)
