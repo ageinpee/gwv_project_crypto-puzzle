@@ -1,4 +1,8 @@
 import copy
+# add python-constraint to the project-interpreter by going to settings-->project interpreter--> press the +
+# --> search for "python-constraint" and press "install packages"
+from constraint import *
+
 # Exercise 11.3: Cryptoarithmetical Puzzle
 # opening a text file with exactly one crypto-puzzle in it
 with open("crypto-puzzle-data.txt", encoding="utf-8") as f:
@@ -71,7 +75,7 @@ global_vd = create_vars(content)
 
 # creating a list of lists with all the vertical alignments in the equation
 # uses the pop() function to get the last element of every sublist.
-# If a list is empty ' ' is added instead, if the element is '_' a '=' is added instead. 
+# If a list is empty ' ' is added instead, if the element is '_' a '=' is added instead.
 # first element is the right-most alignment
 def create_vertical_vars(con):
     vertical_vars = []
@@ -113,8 +117,8 @@ def create_equations():
     return equation
 
 
+# the separated equations
 global_eq = create_equations()
-
 # printing global variables
 print(global_oo)  # oo = operation order
 print(global_vd)  # vd = variable dictionary
@@ -122,4 +126,60 @@ print(global_vv)  # vv = vertical variables --> represents the variables in vert
 print(global_eq)  # eq = equations
 print(content)  # filtered content, at the moment includes just the variables as well as one list/line of underscores '_'
 
+# -----------------------------------------------------------------------------------------------
+#
 
+
+# this function divides the variables/letters into two sets, since the letters at the first position of each word is
+# not allowed to be zero
+def calc_first_vars():
+    global content
+    content = [[elem for elem in x if elem != '_'] for x in content]    # removes the '_' from content
+    variables = [set(), set()]  # first set represents vars not allowed to be zero, second sets vars are allowed to be zero
+    for x in content:   # for every word in the equation
+        for i in range(len(x)):     # for every letter of each word
+            if i == 0:              # check if this letter is at index 0 (first letter)
+                variables[0].add(x[i])      # if yes: add it to the first set of letters
+                if x[i] in variables[1]:    # check if the letter is also in the second set
+                    variables[1].discard(x[i])  # if yes: delete it from the second set
+            else:                           # else
+                if x[i] not in variables[0]:    # check if the letter is not in the first set
+                    variables[1].add(x[i])      # if this is true: add it to the second set of letters
+    return variables
+
+
+global_nzz = calc_first_vars()    # nzz = not zero zero --> a list of 2 sets, first one represents the vars that are
+# not allowed to be zero, the second one represents the rest
+print(global_nzz)
+
+
+# adds all variables and its domains to a given problem
+def add_vars_to(problem):
+    for i in range(len(global_nzz)):
+        if i == 0:
+            for x in global_nzz[i]:
+                problem.addVariable(x, [1,2,3,4,5,6,7,8,9])
+        else:
+            for x in global_nzz[i]:
+                problem.addVariable(x, [0,1,2,3,4,5,6,7,8,9])
+
+
+#
+def add_constraints_to(problem):
+    global global_vv
+    global_vv = [[elem for elem in x if elem != '='] for x in global_vv]
+    for x in global_vv:
+        for i in range(len(x)):
+            problem.addConstraint(lambda x: map((lambda a, b: a+b), x), x)  # atm still problems with ' ' strings in
+            # global_vv. Needs to be fixed. If the expression is correct is still not clear to say.
+            
+
+# function to solve the problem
+def solve():
+    problem = Problem()
+    add_vars_to(problem)
+    add_constraints_to(problem)
+    return problem.getSolution()
+
+
+print(solve())
