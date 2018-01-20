@@ -70,7 +70,8 @@ global_vd = create_vars(content)
 
 
 # creating a list of lists with all the vertical alignments in the equation
-# uses the pop() function to get the last element of every sublist. If a list is empty ' ' is added instead
+# uses the pop() function to get the last element of every sublist.
+# If a list is empty ' ' is added instead, if the element is '_' a '=' is added instead. 
 # first element is the right-most alignment
 def create_vertical_vars(con):
     vertical_vars = []
@@ -81,7 +82,11 @@ def create_vertical_vars(con):
             if not x:
                 vertical_vars[count].append(' ')
             else:
-                vertical_vars[count].append(x.pop())
+                if x[-1] == '_':
+                    x.pop()
+                    vertical_vars[count].append('=')
+                else:
+                    vertical_vars[count].append(x.pop())
         count += 1
     return vertical_vars
 
@@ -92,8 +97,29 @@ vv_content = copy.deepcopy(content)
 global_vv = create_vertical_vars(vv_content)
 
 
+# creates equations from the vertical alignment.
+# for this the vertical alignment and operations order are used.
+def create_equations():
+    global global_vv
+    global global_oo
+    equation = []
+    for x in global_vv:
+        single_eq = []
+        for i in range(len(x)):
+            single_eq.append(x[i])
+            if i < len(global_oo):
+                single_eq.append(global_oo[i])
+        equation.append(single_eq)
+    return equation
+
+
+global_eq = create_equations()
+
 # printing global variables
 print(global_oo)  # oo = operation order
 print(global_vd)  # vd = variable dictionary
 print(global_vv)  # vv = vertical variables --> represents the variables in vertical alignment
+print(global_eq)  # eq = equations
 print(content)  # filtered content, at the moment includes just the variables as well as one list/line of underscores '_'
+
+
