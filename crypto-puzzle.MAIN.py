@@ -88,7 +88,7 @@ def create_vertical_vars(con):
             else:
                 if x[-1] == '_':
                     x.pop()
-                    vertical_vars[count].append('=')
+                    vertical_vars[count].append('==')
                 else:
                     vertical_vars[count].append(x.pop())
         count += 1
@@ -103,6 +103,7 @@ global_vv = create_vertical_vars(vv_content)
 
 # creates equations from the vertical alignment.
 # for this the vertical alignment and operations order are used.
+# TODO make equations more connective. transfer must be taken into concideration.
 def create_equations():
     global global_vv
     global global_oo
@@ -170,7 +171,7 @@ def add_constraints_to(problem):
     global global_vv
     global global_eq
     global global_oo
-    global_vv = [[elem for elem in x if elem != '='] for x in global_vv]    # filtering '=' from global_vv
+    global_vv = [[elem for elem in x if elem != '=='] for x in global_vv]    # filtering '=' from global_vv
     vertvars = []
     for x in global_vv:
         single = ''
@@ -180,19 +181,28 @@ def add_constraints_to(problem):
                     single = single + x[i]
                 else:
                     single = single + x[i] + ', '
-        vertvars.append(single)     # vertvars shall be used to define the variables in the lambda function.
-        # Doesn't work at the moment
+        vertvars.append(single)     # vertvars shall be used to define
+        # the variables in the lambda function. Doesn't work at the moment
         # TODO get the addConstraint lambda to work somehow
     print(vertvars)
     #for i in range(len(vertvars)):
-        #problem.addConstraint(lambda eval(vertvars[i]): eval(global_eq[i], global_vv[i])
+        #problem.addConstraint(lambda a,b,c,d,e: eval(global_eq[i]), set(vertvars[i]))
 
 
 # function to solve the problem
 def solve():
     problem = Problem()
-    add_vars_to(problem)
+    #add_vars_to(problem)
     add_constraints_to(problem)
+
+    # ab hier ist kaka:
+    problem.addVariable("THREE", range(10000, 99999))
+    problem.addVariable("FIVE", range(1000, 9999))
+    problem.addVariable("ELEVEN", range(100000, 999999))
+
+    problem.addConstraint(lambda a, b, c, d: a + b + c == d, ["THREE", "THREE", "FIVE", "ELEVEN"])
+    problem.addConstraint(AllDifferentConstraint())
+    return problem.getSolutions()
 
 
 print(solve())
