@@ -84,7 +84,7 @@ def create_vertical_vars(con):
         vertical_vars.append([])
         for x in con:
             if not x:
-                vertical_vars[count].append(' ')
+                vertical_vars[count].append('')
             else:
                 if x[-1] == '_':
                     x.pop()
@@ -107,13 +107,14 @@ def create_equations():
     global global_vv
     global global_oo
     equation = []
+
     for x in global_vv:
         single_eq = []
         for i in range(len(x)):
             single_eq.append(x[i])
             if i < len(global_oo):
                 single_eq.append(global_oo[i])
-        equation.append(single_eq)
+        equation.append(''.join(single_eq))
     return equation
 
 
@@ -158,28 +159,40 @@ def add_vars_to(problem):
     for i in range(len(global_nzz)):
         if i == 0:
             for x in global_nzz[i]:
-                problem.addVariable(x, [1,2,3,4,5,6,7,8,9])
+                problem.addVariable(x, [1, 2, 3, 4, 5, 6, 7, 8, 9])
         else:
             for x in global_nzz[i]:
-                problem.addVariable(x, [0,1,2,3,4,5,6,7,8,9])
+                problem.addVariable(x, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
 
-#
+# adds all constraints to a given problem
 def add_constraints_to(problem):
     global global_vv
-    global_vv = [[elem for elem in x if elem != '='] for x in global_vv]
+    global global_eq
+    global global_oo
+    global_vv = [[elem for elem in x if elem != '='] for x in global_vv]    # filtering '=' from global_vv
+    vertvars = []
     for x in global_vv:
+        single = ''
         for i in range(len(x)):
-            problem.addConstraint(lambda x: map((lambda a, b: a+b), x), x)  # atm still problems with ' ' strings in
-            # global_vv. Needs to be fixed. If the expression is correct is still not clear to say.
-            
+            if x[i] != '':
+                if i == len(x)-1:
+                    single = single + x[i]
+                else:
+                    single = single + x[i] + ', '
+        vertvars.append(single)     # vertvars shall be used to define the variables in the lambda function.
+        # Doesn't work at the moment
+        # TODO get the addConstraint lambda to work somehow
+    print(vertvars)
+    #for i in range(len(vertvars)):
+        #problem.addConstraint(lambda eval(vertvars[i]): eval(global_eq[i], global_vv[i])
+
 
 # function to solve the problem
 def solve():
     problem = Problem()
     add_vars_to(problem)
     add_constraints_to(problem)
-    return problem.getSolution()
 
 
 print(solve())
