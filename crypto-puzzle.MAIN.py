@@ -103,7 +103,7 @@ global_vv = create_vertical_vars(vv_content)
 
 # creates equations from the vertical alignment.
 # for this the vertical alignment and operations order are used.
-# TODO make equations more connective. transfer must be taken into concideration.
+# TODO make equations more connective. transfer must be taken into consideration.
 def create_equations():
     global global_vv
     global global_oo
@@ -168,25 +168,27 @@ def add_vars_to(problem):
 
 # adds all constraints to a given problem
 def add_constraints_to(problem):
-    global global_vv
-    global global_eq
-    global global_oo
-    global_vv = [[elem for elem in x if elem != '=='] for x in global_vv]    # filtering '=' from global_vv
-    vertvars = []
-    for x in global_vv:
-        single = ''
-        for i in range(len(x)):
-            if x[i] != '':
-                if i == len(x)-1:
-                    single = single + x[i]
-                else:
-                    single = single + x[i] + ', '
-        vertvars.append(single)     # vertvars shall be used to define
-        # the variables in the lambda function. Doesn't work at the moment
+    global global_vv    # declaring global_vv as global for this function
+    global global_eq    # declaring global_eq as global for this function
+    global global_oo    # declaring global_oo as global for this function
+    global_vv = [[elem for elem in x if elem != '=='] for x in global_vv]    # filtering '==' from global_vv
+    vertvars = []   # declaring a local list save the data
+    for x in global_vv:     # for every vertical alignment do:
+        single = ''     # declaring a local string as a temporary variable
+        for i in range(len(x)):     # for every element in a vertical alignment
+            if x[i] != '':      # if a element is not empty. Empty elements occur if one word in the equation is longer than another.
+                if i == len(x)-1:       # if i is the index of the last element in a vertical alignment, meaning the result line
+                    single = single + x[i]      # add that result into to the single variable
+                else:   # if not
+                    single = single + x[i] + ', '   # add the element and a ', ' to the single variable
+        vertvars.append(single)     # append a vertical alignment to the vertvars list. result is that
+        # the vertical alignment as a list of lists is converted to a list of strings.
+        print(vertvars)     # print vertvars for debugging
         # TODO get the addConstraint lambda to work somehow
-    print(vertvars)
     #for i in range(len(vertvars)):
         #problem.addConstraint(lambda a,b,c,d,e: eval(global_eq[i]), set(vertvars[i]))
+    # idea here is to add a constraint for every vertical alignment/vertical equation. Problem is that i didn't find a way until now
+    # to fit this into a suitable lambda expression. Maybe some other form of function might help?
 
 
 # function to solve the problem
