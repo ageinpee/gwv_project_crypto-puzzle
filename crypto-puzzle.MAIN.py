@@ -225,7 +225,7 @@ def add_constraints_to(problem):
     print(eq_wo_result)     # print for debugging
     for i in range(len(eq_wo_result)):  # for every equation that is relevant for the transfer
         vertvars_pseudoset[i].append('x' + str(i))      # add the transfer variable to the variables
-        problem.addConstraint(lambda x0, x1, x2, x3, x4, x5, x6, x7, x8: eval(eq_wo_result[i]), vertvars_pseudoset[i])  # add the constraints to the problem with the equations and the variables
+        problem.addConstraint(lambda x0, x1, x2, x3, x4, x5, x6, x7, x8: math.floor(eval(eq_wo_result[i])/10), vertvars_pseudoset[i])  # add the constraints to the problem with the equations and the variables
         # TODO problem is that the lambda function requires exactly the given amount of arguments. if they can't be provided errors are thrown
         # TODO to be fixed in both addConstraint-methods
 
