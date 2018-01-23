@@ -104,7 +104,6 @@ global_vv = create_vertical_vars(vv_content)
 # creates equations from the vertical alignment.
 # for this the vertical alignment and operations order are used.
 # TODO currently only supports transfer for addition. Other Operations have to be implemented
-# TODO make equations more connective. transfer must be taken into consideration.
 def create_equations():
     global global_vv
     global global_oo
@@ -120,7 +119,7 @@ def create_equations():
                 single_eq.append('0')   # replacing ''
             else:
                 single_eq.append(x[i])      # if there is nothing to replace, append the given value
-            if i < len(global_oo):      # if i is not the last index for the list
+            if i < len(global_oo):  # if i is not the last index for the list
                 single_eq.append(global_oo[i])  # add the operation-sign from the operations order
         equation.append(''.join(single_eq))     # append the part-equation to the list of all equations.
         counter += 1    # increment the counter for the transfer-variables
@@ -174,8 +173,8 @@ def add_vars_to(problem):
         else:
             for x in global_nzz[i]:
                 problem.addVariable(x, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])  # adding variables with domains that do include zero
-    for i in range(len(global_vv)):
-        problem.addVariable('x'+str(i), [0, 1, 2, 3])   # adding transfer-variables with the domains 0-3 (at least for now)
+    for i in range(len(global_vv)+1):
+        problem.addVariable('x'+str(i), [0, 1, 2, 3, 4])   # adding transfer-variables with the domains 0-3 (at least for now)
 
 
 
@@ -185,6 +184,7 @@ def add_constraints_to(problem):
     global global_eq    # declaring global_eq as global for this function
     global global_oo    # declaring global_oo as global for this function
     global_vv = [[elem for elem in x if elem != '=='] for x in global_vv]    # filtering '==' from global_vv
+    print(global_vv)
     vertvars = []   # declaring a local list save the data
     for x in global_vv:     # for every vertical alignment do:
         single = ''     # declaring a local string as a temporary variable
@@ -204,12 +204,15 @@ def add_constraints_to(problem):
         if ',' in x:        #
             x.remove(',')   #
     vertvars_pseudoset = [list(x) for x in vertvars_set]    # converts the sets back to lists due to contracts later (addConstraint does not accept sets)
+    for i in range(len(vertvars_pseudoset)):
+        if i != 0:
+            vertvars_pseudoset[i].append('x' + str(i))
     print(vertvars_pseudoset)       # print for debugging
     for i in range(len(vertvars_pseudoset)):    # iterate over vertvars_pseudoset to add the constraints to the problem
         print('xxx')                        #
         print(global_eq[i])                 # Prints for debugging
         print(vertvars_pseudoset[i])        #
-        problem.addConstraint(lambda a, b, c, d, e: eval(global_eq[i]), vertvars_pseudoset[i])      # --> adding the constraints for the equations.
+        problem.addConstraint(lambda a, b, c, d: eval(global_eq[i]), vertvars_pseudoset[i])      # --> adding the constraints for the equations.
     eq_wo_result = list()       # read: equation without result --> used for the transfer constraints
     for x in global_eq:
         single_eq = ''  # a single equation without a result
@@ -225,9 +228,8 @@ def add_constraints_to(problem):
     print(eq_wo_result)     # print for debugging
     for i in range(len(eq_wo_result)):  # for every equation that is relevant for the transfer
         vertvars_pseudoset[i].append('x' + str(i))      # add the transfer variable to the variables
-        problem.addConstraint(lambda x0, x1, x2, x3, x4, x5, x6, x7, x8: math.floor(eval(eq_wo_result[i])/10), vertvars_pseudoset[i])  # add the constraints to the problem with the equations and the variables
-        # TODO problem is that the lambda function requires exactly the given amount of arguments. if they can't be provided errors are thrown
-        # TODO to be fixed in both addConstraint-methods
+        problem.addConstraint(lambda x: math.floor(eval(eq_wo_result[i])/10), vertvars_pseudoset[i])  # add the constraints to the problem with the equations and the variables
+        # TODO lambda function requires the exact amount of variables as in the equation and they have to be named exactly the same way as in the domain-variables for the constraints. 
 
 
 # function to solve the problem
@@ -242,7 +244,7 @@ def solve():
     #problem.addVariable("ELEVEN", range(100000, 999999))
     #problem.addConstraint(lambda a, b, c, d: a + b + c == d, ["THREE", "THREE", "FIVE", "ELEVEN"])
 
-    problem.addConstraint(AllDifferentConstraint())
+    #problem.addConstraint(AllDifferentConstraint())
     return problem.getSolutions()
 
 
