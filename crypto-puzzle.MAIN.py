@@ -209,10 +209,15 @@ def add_constraints_to(problem):
             vertvars_pseudoset[i].append('x' + str(i))
     print(vertvars_pseudoset)       # print for debugging
     for i in range(len(vertvars_pseudoset)):    # iterate over vertvars_pseudoset to add the constraints to the problem
-        print('xxx')                        #
-        print(global_eq[i])                 # Prints for debugging
-        print(vertvars_pseudoset[i])        #
-        problem.addConstraint(lambda a, b, c, d: eval(global_eq[i]), vertvars_pseudoset[i])      # --> adding the constraints for the equations.
+        #print('xxx')                        #
+        #print(global_eq[i])                 # Prints for debugging
+        #print(vertvars_pseudoset[i])        #
+        vars_as_string = ''
+        for x in vertvars_pseudoset[i]:
+            vars_as_string = vars_as_string + x + ', '
+        vars_as_string = vars_as_string[:-2]
+        #print(vars_as_string)
+        #problem.addConstraint(eval("lambda " + vars_as_string + ": " + global_eq[i]), vertvars_pseudoset[i])     # --> adding the constraints for the equations.
     eq_wo_result = list()       # read: equation without result --> used for the transfer constraints
     for x in global_eq:
         single_eq = ''  # a single equation without a result
@@ -227,9 +232,17 @@ def add_constraints_to(problem):
         eq_wo_result[i] = eq_wo_result[i] + '==' + 'x' + str(i+1)   # add transfer-variables to the equation
     print(eq_wo_result)     # print for debugging
     for i in range(len(eq_wo_result)):  # for every equation that is relevant for the transfer
-        vertvars_pseudoset[i].append('x' + str(i))      # add the transfer variable to the variables
-        problem.addConstraint(lambda x: math.floor(eval(eq_wo_result[i])/10), vertvars_pseudoset[i])  # add the constraints to the problem with the equations and the variables
-        # TODO lambda function requires the exact amount of variables as in the equation and they have to be named exactly the same way as in the domain-variables for the constraints. 
+        vertvars_pseudoset[i].append('x' + str(i+1))      # add the transfer variable to the variables
+        vars_as_string = ''
+        for x in vertvars_pseudoset[i]:
+            vars_as_string = vars_as_string + x + ', '
+        vars_as_string = vars_as_string[:-2]
+        print('xxx')
+        print(vertvars_pseudoset[i])
+        print(vars_as_string)
+        print("math.floor((" + eq_wo_result[i] + ")/10)")
+        problem.addConstraint(eval("lambda " + vars_as_string + ": " + "math.floor((" + eq_wo_result[i] + ")/10)"), vertvars_pseudoset[i])     # add the constraints to the problem with the equations and the variables
+        # TODO lambda function requires the exact amount of variables as in the equation and they have to be named exactly the same way as in the domain-variables for the constraints.
 
 
 # function to solve the problem
