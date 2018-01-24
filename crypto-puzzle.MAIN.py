@@ -210,15 +210,15 @@ def add_constraints_to(problem):
             vertvars_pseudoset[i].append('x' + str(i))
     print(vertvars_pseudoset)       # print for debugging
     for i in range(len(vertvars_pseudoset)):    # iterate over vertvars_pseudoset to add the constraints to the problem
-        #print('xxx')                        #
-        #print(global_eq[i])                 # Prints for debugging
-        #print(vertvars_pseudoset[i])        #
+        print('xxx')                        #
+        print(global_eq[i])                 # Prints for debugging
+        print(vertvars_pseudoset[i])        #
         vars_as_string = ''
         for x in vertvars_pseudoset[i]:
             vars_as_string = vars_as_string + x + ', '
         vars_as_string = vars_as_string[:-2]
-        #print(vars_as_string)
-        # problem.addConstraint(eval("lambda " + vars_as_string + ": " + global_eq[i]), vertvars_pseudoset[i])     # --> adding the constraints for the equations.
+        print(vars_as_string)
+        problem.addConstraint(eval("lambda " + vars_as_string + ": " + global_eq[i]), vertvars_pseudoset[i])     # --> adding the constraints for the equations.
     eq_wo_result = list()       # read: equation without result --> used for the transfer constraints
     for x in global_eq:
         single_eq = ''  # a single equation without a result
@@ -238,7 +238,7 @@ def add_constraints_to(problem):
         for x in vertvars_pseudoset[i]:
             vars_as_string = vars_as_string + x + ', '
         vars_as_string = vars_as_string[:-2]
-        print('xxx')
+        print('yyy')
         print(vertvars_pseudoset[i])
         print(vars_as_string)
         print("math.floor((" + eq_wo_result[i] + ")/10)")
