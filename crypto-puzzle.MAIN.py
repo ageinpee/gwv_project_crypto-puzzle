@@ -2,6 +2,7 @@ import copy
 # add python-constraint to the project-interpreter by going to settings-->project interpreter--> press the +
 # --> search for "python-constraint" and press "install packages"
 from constraint import *
+import math
 
 # Exercise 11.3: Cryptoarithmetical Puzzle
 # opening a text file with exactly one crypto-puzzle in it
@@ -217,7 +218,7 @@ def add_constraints_to(problem):
             vars_as_string = vars_as_string + x + ', '
         vars_as_string = vars_as_string[:-2]
         #print(vars_as_string)
-        #problem.addConstraint(eval("lambda " + vars_as_string + ": " + global_eq[i]), vertvars_pseudoset[i])     # --> adding the constraints for the equations.
+        # problem.addConstraint(eval("lambda " + vars_as_string + ": " + global_eq[i]), vertvars_pseudoset[i])     # --> adding the constraints for the equations.
     eq_wo_result = list()       # read: equation without result --> used for the transfer constraints
     for x in global_eq:
         single_eq = ''  # a single equation without a result
@@ -241,7 +242,7 @@ def add_constraints_to(problem):
         print(vertvars_pseudoset[i])
         print(vars_as_string)
         print("math.floor((" + eq_wo_result[i] + ")/10)")
-        problem.addConstraint(eval("lambda " + vars_as_string + ": " + "math.floor((" + eq_wo_result[i] + ")/10)"), vertvars_pseudoset[i])     # add the constraints to the problem with the equations and the variables
+        problem.addConstraint(eval("lambda " + vars_as_string + ": " + "__import__('math').floor((" + eq_wo_result[i] + ")/10)", {"__builtins__": None}), vertvars_pseudoset[i])     # add the constraints to the problem with the equations and the variables
         # TODO lambda function requires the exact amount of variables as in the equation and they have to be named exactly the same way as in the domain-variables for the constraints.
 
 
