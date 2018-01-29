@@ -1,0 +1,7 @@
+     lisp
++    lisp
++   logic
++   logic
++
+_________
+   prolog 

@@ -1,0 +1,7 @@
+    three
++   three
++     two
++     two    
++     one  
+_________
+=  eleven 
