@@ -8,7 +8,7 @@ from pprint import pprint
 
 # Exercise 11.3: Cryptoarithmetical Puzzle
 # opening a text file with exactly one crypto-puzzle in it
-#with open("crypto-puzzle-data.txt", encoding="utf-8") as f:
+# with open("crypto-puzzle-data.txt", encoding="utf-8") as f:
 with open("crypto-puzzle-data.txt") as f:
     content = f.readlines()
 
@@ -179,15 +179,14 @@ def add_vars_to(problem):
                 problem.addVariable(x, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])  # adding variables with domains that do include zero
     for i in range(len(global_vv)+1):
         problem.addVariable('x'+str(i), [0, 1, 2, 3, 4])   # adding transfer-variables with the domains 0-3 (at least for now)
-    problem.addVariable("zero",[0])
-
+    problem.addVariable("zero", [0])
 
 
 # adds all constraints to a given problem
 def add_constraints_to(problem):
-    global global_vv    # declaring global_vv as global for this function
-    global global_eq    # declaring global_eq as global for this function
-    global global_oo    # declaring global_oo as global for this function
+    global global_vv
+    global global_eq
+    global global_oo
     global global_nzz
     global_vv = [[elem for elem in x if elem != '=='] for x in global_vv]    # filtering '==' from global_vv
     print(global_vv)
@@ -198,103 +197,30 @@ def add_constraints_to(problem):
     unique_vars = []    
     for varset in global_nzz:
         unique_vars.extend(varset)
-    print unique_vars
+    print(unique_vars)
     problem.addConstraint(OurAllDifferentConstraint(unique_vars))
-    #raw_input()
-    for idx,varlist in enumerate(global_vv):
+
+    for idx, varlist in enumerate(global_vv):
         if idx == 0:
-            varlist.insert(5,"zero")
-            varlist.insert(6,"x0")
+            varlist.insert(5, "zero")
+            varlist.insert(6, "x0")
 
         else:
-            varlist.insert(5,"x"+str(idx-1))
-            varlist.insert(6,"x"+str(idx))
+            varlist.insert(5, "x"+str(idx-1))
+            varlist.insert(6, "x"+str(idx))
             
-        for idx_val,val in enumerate(varlist):
-            if val =="":
-                varlist[idx_val]="zero"
-        print varlist
-        problem.addConstraint(lambda a,b,c,d,e,u1,u2,r:a+b+c+d+e+u1==10*u2+r, varlist)
-    #raw_input()
-    
-#    #raw_input()
-#    vertvars = []   # declaring a local list save the data
-#    for x in global_vv:     # for every vertical alignment do:
-#        single = ''     # declaring a local string as a temporary variable
-#        for i in range(len(x)):     # for every element in a vertical alignment
-#            if x[i] != '':      # if a element is not empty. Empty elements occur if one word in the equation is longer than another.
-#                if i == len(x)-1:       # if i is the index of the last element in a vertical alignment, meaning the result line
-#                    single = single + x[i]      # add that result into to the single variable
-#                else:   # if not
-#                    single = single + x[i] + ', '   # add the element and a ', ' to the single variable
-#        vertvars.append(single)     # append a vertical alignment to the vertvars list. result is that
-#        # the vertical alignment as a list of lists is converted to a list of strings.
-#    print(vertvars)     # print vertvars for debugging
-#    vertvars_set = [set(x) for x in vertvars]   # creates a list of sets of all vertical variables
-#    for x in vertvars_set:  #
-#        if ' ' in x:        #
-#            x.remove(' ')   # removing unwanted characters that are in the data due to String representation
-#        if ',' in x:        #
-#            x.remove(',')   #
-#    vertvars_pseudoset = [list(x) for x in vertvars_set]    # converts the sets back to lists due to contracts later (addConstraint does not accept sets)
-#    for i in range(len(vertvars_pseudoset)):
-#        if i != 0:
-#            vertvars_pseudoset[i].append('x' + str(i))
-#    print(vertvars_pseudoset)       # print for debugging
-#    for i in range(len(vertvars_pseudoset)):    # iterate over vertvars_pseudoset to add the constraints to the problem
-#        print('xxx')                        #
-#        print(global_eq[i])                 # Prints for debugging
-#        print(vertvars_pseudoset[i])        #
-#        vars_as_string = ''
-#        for x in vertvars_pseudoset[i]:
-#            vars_as_string = vars_as_string + x + ', '
-#        vars_as_string = vars_as_string[:-2]
-#        print(vars_as_string)
-#        print(global_eq[i])
-#        print(vertvars_pseudoset[i])
-#        problem.addConstraint(lambda a, b: a*2 == b,("T", "H"))
-#        problem.addConstraint(eval("lambda " + vars_as_string + ": " + global_eq[i]), vertvars_pseudoset[i])     # --> adding the constraints for the equations.
-#    eq_wo_result = list()       # read: equation without result --> used for the transfer constraints
-#    for x in global_eq:
-#        single_eq = ''  # a single equation without a result
-#        for y in x:     # for every letter in the string
-#            if y == '=':    # if y equals '='
-#                break       # break, because after '=' there is only the result left, what we don't want in our equation
-#            else:           # else
-#                single_eq = single_eq + y       # add the value (it's either a variable or a operation sign) to the single_eq string
-#        eq_wo_result.append(single_eq)      # append the single_eq to the list of equations without a result
-#    print(eq_wo_result)     # print for debugging
-#    for i in range(len(eq_wo_result)):
-#        eq_wo_result[i] = eq_wo_result[i] + '==' + 'x' + str(i+1)   # add transfer-variables to the equation
-#    print(eq_wo_result)     # print for debugging
-#    for i in range(len(eq_wo_result)):  # for every equation that is relevant for the transfer
-#        vertvars_pseudoset[i].append('x' + str(i+1))      # add the transfer variable to the variables
-#        vars_as_string = ''
-#        for x in vertvars_pseudoset[i]:
-#            vars_as_string = vars_as_string + x + ', '
-#        vars_as_string = vars_as_string[:-2]
-#        print('yyy')
-#        print(vertvars_pseudoset[i])
-#        print(vars_as_string)
-#        print("math.floor((" + eq_wo_result[i] + ")/10)")
-#        #problem.addConstraint(eval("lambda " + vars_as_string + ": " + "__import__('math').floor((" + eq_wo_result[i] + ")/10)", {"__builtins__": None}), vertvars_pseudoset[i])     # add the constraints to the problem with the equations and the variables
-#        # TODO lambda function requires the exact amount of variables as in the equation and they have to be named exactly the same way as in the domain-variables for the constraints.
-#        #problem.addConstraint(AddConstraint())
-#        print(eq_wo_result)
+        for idx_val, val in enumerate(varlist):
+            if val == "":
+                varlist[idx_val] = "zero"
+        print(varlist)
+        problem.addConstraint(lambda a, b, c, d, e, u1, u2, r: a+b+c+d+e+u1 == 10*u2+r, varlist)
+
 
 # function to solve the problem
 def solve():
     problem = Problem()
     add_vars_to(problem)
     add_constraints_to(problem)
-
-    # ab hier ist kaka:
-    #problem.addVariable("THREE", range(10000, 99999))
-    #problem.addVariable("FIVE", range(1000, 9999))
-    #problem.addVariable("ELEVEN", range(100000, 999999))
-    #problem.addConstraint(lambda a, b, c, d: a + b + c == d, ["THREE", "THREE", "FIVE", "ELEVEN"])
-
-    #problem.addConstraint(AllDifferentConstraint())
     return problem.getSolutions()
 
 

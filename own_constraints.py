@@ -6,6 +6,8 @@ Created on Mon Jan 29 10:29:44 2018
 """
 from constraint import Constraint
 from constraint import Unassigned
+
+
 class AddConstraint(Constraint):
     """
     Constraint enforcing that values of given variables sum at least
@@ -38,6 +40,7 @@ class AddConstraint(Constraint):
         if res+uebertrag==variables[0]+variables[1]+variables[2]+variables[3]+variables[4]:
             return True
         return False
+
         
 class OurAllDifferentConstraint(Constraint):
     """
