@@ -189,15 +189,9 @@ def add_constraints_to(problem):
     global global_oo
     global global_nzz
     global_vv = [[elem for elem in x if elem != '=='] for x in global_vv]    # filtering '==' from global_vv
-    print(global_vv)
-    
-    print(global_eq)   
-    print(global_oo)
-    print(global_nzz)
     unique_vars = []    
     for varset in global_nzz:
         unique_vars.extend(varset)
-    print(unique_vars)
     problem.addConstraint(OurAllDifferentConstraint(unique_vars))
 
     for idx, varlist in enumerate(global_vv):
@@ -212,7 +206,6 @@ def add_constraints_to(problem):
         for idx_val, val in enumerate(varlist):
             if val == "":
                 varlist[idx_val] = "zero"
-        print(varlist)
         problem.addConstraint(lambda a, b, c, d, e, u1, u2, r: a+b+c+d+e+u1 == 10*u2+r, varlist)
 
 
@@ -230,16 +223,37 @@ for dictionary in global_solutions:
     for key in dictionary:
         if key in global_vd:
             global_vd[key].append(dictionary[key])
-pprint(global_vd)
 
+print('------------------------------------------------------------------------')
+print('>>> One possible solution for the puzzle is:')
+print('')
 solution_string = ''
 longest = max(len(l) for l in content)
-for lst in content:
+for index, lst in enumerate(content):
+    if index == 0 or index == len(lst):
+        if index == len(lst):
+            solution_string = solution_string + '_'
+        else:
+            solution_string = solution_string + ' '
+    else:
+        solution_string = solution_string + '+'
     for i in range(len(lst), longest):
         solution_string = solution_string + ' '
+    if index == len(lst):
+        for i in range(longest):
+            solution_string = solution_string + '_'
+        solution_string = solution_string + ' \n '
     if len(lst) != 0:
         for letter in lst:
             solution_string = solution_string + str(global_vd[letter][0])
     solution_string = solution_string + ' \n'
 
 print(solution_string)
+
+
+# function to find puzzles. Words for these puzzles are taken from a txt-file located at path.
+# @param path --> string representation of a txt-file for the word-list
+def find_puzzles(path):
+    wordlist = []
+    with open(path) as f:
+        wordlist = f.readlines()
