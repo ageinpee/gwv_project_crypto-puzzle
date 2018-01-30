@@ -6,11 +6,12 @@ import math
 from own_constraints import OurAllDifferentConstraint
 from pprint import pprint
 
+
 # Exercise 11.3: Cryptoarithmetical Puzzle
 # opening a text file with exactly one crypto-puzzle in it
 # with open("crypto-puzzle-data.txt", encoding="utf-8") as f:
 with open("crypto-puzzle-data.txt") as f:
-    content = f.readlines()
+    example = f.readlines()
 
 
 # function to format the file
@@ -26,67 +27,52 @@ def format_input(con):
 
 
 # formatting the content
-content = format_input(content)
+example = format_input(example)
 
 
-# function to define the order of operations.
-# function iterates over the list of character(content) and checks if one of these characters is an operation
-# if this is true, this operations sign is added to the op_order list.
-# currently not implemented: prioritising point over line operations
-def create_operation_order(con):
+def solve_puzzle(content):
+    # function to define the order of operations.
+    # function iterates over the list of character(content) and checks if one of these characters is an operation
+    # if this is true, this operations sign is added to the op_order list.
+    # currently not implemented: prioritising point over line operations
     op_order = []
-    for x in con:
+    for x in content:
         for y in x:
             if y == '+' or y == '-' or y == '*' or y == '/':
                 op_order.append(y)
-    return op_order
+    global_oo = op_order
 
+    # filtering all operation symbols from the content
+    # '+', '-', '*' and '/' are removed
+    content = [[elem for elem in x if elem != '+'] for x in content]
+    content = [[elem for elem in x if elem != '-'] for x in content]
+    content = [[elem for elem in x if elem != '*'] for x in content]
+    content = [[elem for elem in x if elem != '/'] for x in content]
 
-# creating the operations order
-global_oo = create_operation_order(content)
-
-
-# filtering all operation symbols from the content
-# '+', '-', '*' and '/' are removed
-def filter_operations(con):
-    con = [[elem for elem in x if elem != '+'] for x in con]
-    con = [[elem for elem in x if elem != '-'] for x in con]
-    con = [[elem for elem in x if elem != '*'] for x in con]
-    con = [[elem for elem in x if elem != '/'] for x in con]
-    return con
-
-
-# filtering operation symbols
-content = filter_operations(content)
-
-
-# creates a dictionary of the variables in the puzzle so that every variable is a key in the dictionary
-# underscore lines ('_') are removed from the dict
-# this dictionary can be used to save the possible solutions for a puzzle. If there are more than one solution they can be added to the list
-def create_vars(con):
+    # creates a dictionary of the variables in the puzzle so that every variable is a key in the dictionary
+    # underscore lines ('_') are removed from the dict
+    # this dictionary can be used to save the possible solutions for a puzzle. If there are more than one solution they can be added to the list
     var_dict = {}
-    for x in con:
+    for x in content:
         for y in x:
             if y not in var_dict.keys():
                 var_dict[y] = []
     var_dict.pop('_', None)
-    return var_dict
 
+    # creating the variable dictionary
+    global_vd = var_dict
 
-# creating the variable dictionary
-global_vd = create_vars(content)
-
-
-# creating a list of lists with all the vertical alignments in the equation
-# uses the pop() function to get the last element of every sublist.
-# If a list is empty ' ' is added instead, if the element is '_' a '=' is added instead.
-# first element is the right-most alignment
-def create_vertical_vars(con):
+    # creating a list of lists with all the vertical alignments in the equation
+    # uses the pop() function to get the last element of every sublist.
+    # If a list is empty ' ' is added instead, if the element is '_' a '=' is added instead.
+    # first element is the right-most alignment
+    # copying the values of content to another variable to keep the data after getting the vertical alignments
+    vv_content = copy.deepcopy(content)
     vertical_vars = []
     count = 0
-    for i in range(len(max(con, key=len))):
+    for i in range(len(max(vv_content, key=len))):
         vertical_vars.append([])
-        for x in con:
+        for x in vv_content:
             if not x:
                 vertical_vars[count].append('')
             else:
@@ -96,23 +82,14 @@ def create_vertical_vars(con):
                 else:
                     vertical_vars[count].append(x.pop())
         count += 1
-    return vertical_vars
 
+    # creating a list of lists of the vertical alignments in the equation
+    global_vv = vertical_vars
 
-# copying the values of content to another variable to keep the data after getting the vertical alignments
-vv_content = copy.deepcopy(content)
-# creating a list of lists of the vertical alignments in the equation
-global_vv = create_vertical_vars(vv_content)
-
-
-# creates equations from the vertical alignment.
-# for this the vertical alignment and operations order are used.
-# TODO currently only supports transfer for addition. Other Operations have to be implemented
-def create_equations():
-    global global_vv
-    global global_oo
+    # creates equations from the vertical alignment.
+    # for this the vertical alignment and operations order are used.
+    # TODO currently only supports transfer for addition. Other Operations have to be implemented
     equation = []
-
     counter = 0
     for x in global_vv:
         single_eq = list()   # represents a single equation of a vertical alignment
@@ -127,26 +104,13 @@ def create_equations():
                 single_eq.append(global_oo[i])  # add the operation-sign from the operations order
         equation.append(''.join(single_eq))     # append the part-equation to the list of all equations.
         counter += 1    # increment the counter for the transfer-variables
-    return equation
 
+    # the separated equations
+    global_eq = equation
+    # printing global variables
 
-# the separated equations
-global_eq = create_equations()
-# printing global variables
-print(global_oo)  # oo = operation order
-print(global_vd)  # vd = variable dictionary
-print(global_vv)  # vv = vertical variables --> represents the variables in vertical alignment
-print(global_eq)  # eq = equations
-print(content)  # filtered content, at the moment includes just the variables as well as one list/line of underscores '_'
-
-# -----------------------------------------------------------------------------------------------
-#
-
-
-# this function divides the variables/letters into two sets, since the letters at the first position of each word are
-# not allowed to be zero
-def calc_first_vars():
-    global content
+    # this function divides the variables/letters into two sets, since the letters at the first position of each word are
+    # not allowed to be zero
     content = [[elem for elem in x if elem != '_'] for x in content]    # removes the '_' from content
     variables = [set(), set()]  # first set represents vars not allowed to be zero, second sets vars are allowed to be zero
     for x in content:   # for every word in the equation
@@ -158,18 +122,12 @@ def calc_first_vars():
             else:                           # else
                 if x[i] not in variables[0]:    # check if the letter is not in the first set
                     variables[1].add(x[i])      # if this is true: add it to the second set of letters
-    return variables
 
+    global_nzz = variables    # nzz = not zero zero --> a list of 2 sets, first one represents the vars that are
+    # not allowed to be zero, the second one represents the rest
 
-global_nzz = calc_first_vars()    # nzz = not zero zero --> a list of 2 sets, first one represents the vars that are
-# not allowed to be zero, the second one represents the rest
-print(global_nzz)
-
-
-# adds all variables and its domains to a given problem
-def add_vars_to(problem):
-    global global_nzz
-    global global_vv
+    problem = Problem()
+    # adds all variables and its domains to a given problem
     for i in range(len(global_nzz)):
         if i == 0:
             for x in global_nzz[i]:
@@ -181,15 +139,9 @@ def add_vars_to(problem):
         problem.addVariable('x'+str(i), [0, 1, 2, 3, 4])   # adding transfer-variables with the domains 0-3 (at least for now)
     problem.addVariable("zero", [0])
 
-
-# adds all constraints to a given problem
-def add_constraints_to(problem):
-    global global_vv
-    global global_eq
-    global global_oo
-    global global_nzz
+    # adds all constraints to a given problem
     global_vv = [[elem for elem in x if elem != '=='] for x in global_vv]    # filtering '==' from global_vv
-    unique_vars = []    
+    unique_vars = []
     for varset in global_nzz:
         unique_vars.extend(varset)
     problem.addConstraint(OurAllDifferentConstraint(unique_vars))
@@ -198,62 +150,87 @@ def add_constraints_to(problem):
         if idx == 0:
             varlist.insert(5, "zero")
             varlist.insert(6, "x0")
-
         else:
             varlist.insert(5, "x"+str(idx-1))
             varlist.insert(6, "x"+str(idx))
-            
         for idx_val, val in enumerate(varlist):
             if val == "":
                 varlist[idx_val] = "zero"
         problem.addConstraint(lambda a, b, c, d, e, u1, u2, r: a+b+c+d+e+u1 == 10*u2+r, varlist)
 
+    # function to solve the problem
+    global_solutions = problem.getSolutions()
 
-# function to solve the problem
-def solve():
-    problem = Problem()
-    add_vars_to(problem)
-    add_constraints_to(problem)
-    return problem.getSolutions()
+    if global_solutions != []:
+        for dictionary in global_solutions:
+            for key in dictionary:
+                if key in global_vd:
+                    global_vd[key].append(dictionary[key])
 
-
-global_solutions = solve()
-
-for dictionary in global_solutions:
-    for key in dictionary:
-        if key in global_vd:
-            global_vd[key].append(dictionary[key])
-
-print('------------------------------------------------------------------------')
-print('>>> One possible solution for the puzzle is:')
-print('')
-solution_string = ''
-longest = max(len(l) for l in content)
-for index, lst in enumerate(content):
-    if index == 0 or index == len(lst):
-        if index == len(lst):
-            solution_string = solution_string + '_'
+        print('------------------------------------------------------------------------')
+        print('>>> One possible solution for the puzzle is:')
+        print('')
+        solution_string = ''
+        longest = max(len(l) for l in content)
+        for index, lst in enumerate(content):
+            if index == 0 or index == len(lst):
+                if index == len(lst):
+                    solution_string = solution_string + '_'
+                else:
+                    solution_string = solution_string + ' '
+            else:
+                solution_string = solution_string + '+'
+            for i in range(len(lst), longest):
+                solution_string = solution_string + ' '
+            if index == len(lst):
+                for i in range(longest):
+                    solution_string = solution_string + '_'
+                solution_string = solution_string + ' \n '
+            if len(lst) != 0:
+                for letter in lst:
+                    solution_string = solution_string + str(global_vd[letter][0])
+            solution_string = solution_string + ' \n'
+            print(content)
+            print(solution_string)
         else:
-            solution_string = solution_string + ' '
-    else:
-        solution_string = solution_string + '+'
-    for i in range(len(lst), longest):
-        solution_string = solution_string + ' '
-    if index == len(lst):
-        for i in range(longest):
-            solution_string = solution_string + '_'
-        solution_string = solution_string + ' \n '
-    if len(lst) != 0:
-        for letter in lst:
-            solution_string = solution_string + str(global_vd[letter][0])
-    solution_string = solution_string + ' \n'
+            print("There is no solution for the given input")
 
-print(solution_string)
-
+# solve_puzzle(example)
 
 # function to find puzzles. Words for these puzzles are taken from a txt-file located at path.
 # @param path --> string representation of a txt-file for the word-list
 def find_puzzles(path):
     wordlist = []
-    with open(path) as f:
-        wordlist = f.readlines()
+    with open(path) as file:
+        wordlist = file.readlines()
+
+    wordlist = [x.strip() for x in wordlist]
+    wordlist = [list(x) for x in wordlist]
+    wordlist = [[elem for elem in x if elem != ' '] for x in wordlist]
+
+    wordlist.append([])
+    pprint(wordlist)
+
+    combination = []
+    for first_word in wordlist:
+        for second_word in wordlist:
+            for third_word in wordlist:
+                for fourth_word in wordlist:
+                    for fifth_word in wordlist:
+                        for result in wordlist:
+                            single_content = []
+                            single_content.append(first_word)
+                            single_content.append(second_word)
+                            single_content.append(third_word)
+                            single_content.append(fourth_word)
+                            single_content.append(fifth_word)
+                            single_content.append(['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'])
+                            single_content.append(result)
+                            print(single_content)
+                            combination.append(single_content)
+
+    for content in combination:
+        solve_puzzle(content)
+
+
+find_puzzles('crypto-puzzle-wordlist.txt')
