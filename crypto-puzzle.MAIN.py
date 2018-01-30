@@ -10,7 +10,7 @@ from pprint import pprint
 # Exercise 11.3: Cryptoarithmetical Puzzle
 # opening a text file with exactly one crypto-puzzle in it
 # with open("crypto-puzzle-data.txt", encoding="utf-8") as f:
-with open("crypto-puzzle-data.txt") as f:
+with open("crypto-puzzle-data1.txt") as f:
     example = f.readlines()
 
 
@@ -173,7 +173,7 @@ def solve_puzzle(content):
         solution_string = ''
         longest = max(len(l) for l in content)
         for index, lst in enumerate(content):
-            if index == 0 or index == len(lst):
+            if index == 0 or index == len(content)-1:
                 if index == len(lst):
                     solution_string = solution_string + '_'
                 else:
@@ -182,7 +182,7 @@ def solve_puzzle(content):
                 solution_string = solution_string + '+'
             for i in range(len(lst), longest):
                 solution_string = solution_string + ' '
-            if index == len(lst):
+            if index == len(content)-1:
                 for i in range(longest):
                     solution_string = solution_string + '_'
                 solution_string = solution_string + ' \n '
@@ -190,12 +190,11 @@ def solve_puzzle(content):
                 for letter in lst:
                     solution_string = solution_string + str(global_vd[letter][0])
             solution_string = solution_string + ' \n'
-            print(content)
-            print(solution_string)
         else:
             print("There is no solution for the given input")
+        print(content)
+        print(solution_string)
 
-# solve_puzzle(example)
 
 # function to find puzzles. Words for these puzzles are taken from a txt-file located at path.
 # @param path --> string representation of a txt-file for the word-list
@@ -232,5 +231,5 @@ def find_puzzles(path):
     for content in combination:
         solve_puzzle(content)
 
-
-find_puzzles('crypto-puzzle-wordlist.txt')
+solve_puzzle(example)
+# find_puzzles('crypto-puzzle-wordlist.txt')
