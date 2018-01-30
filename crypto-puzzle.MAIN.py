@@ -224,4 +224,22 @@ def solve():
     return problem.getSolutions()
 
 
-pprint(solve())
+global_solutions = solve()
+
+for dictionary in global_solutions:
+    for key in dictionary:
+        if key in global_vd:
+            global_vd[key].append(dictionary[key])
+pprint(global_vd)
+
+solution_string = ''
+longest = max(len(l) for l in content)
+for lst in content:
+    for i in range(len(lst), longest):
+        solution_string = solution_string + ' '
+    if len(lst) != 0:
+        for letter in lst:
+            solution_string = solution_string + str(global_vd[letter][0])
+    solution_string = solution_string + ' \n'
+
+print(solution_string)
