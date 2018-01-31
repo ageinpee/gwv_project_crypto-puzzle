@@ -166,7 +166,6 @@ def solve_puzzle(content):
             for key in dictionary:
                 if key in global_vd:
                     global_vd[key].append(dictionary[key])
-
         print('------------------------------------------------------------------------')
         print('>>> One possible solution for the puzzle is:')
         print('')
@@ -190,10 +189,12 @@ def solve_puzzle(content):
                 for letter in lst:
                     solution_string = solution_string + str(global_vd[letter][0])
             solution_string = solution_string + ' \n'
-        else:
-            print("There is no solution for the given input")
+            print(content)
+            print(solution_string)
+    else:
         print(content)
-        print(solution_string)
+        print("There is no solution for the given input")
+
 
 
 # function to find puzzles. Words for these puzzles are taken from a txt-file located at path.
@@ -231,5 +232,6 @@ def find_puzzles(path):
     for content in combination:
         solve_puzzle(content)
 
-solve_puzzle(example)
-# find_puzzles('crypto-puzzle-wordlist.txt')
+
+#solve_puzzle(example)
+find_puzzles('crypto-puzzle-wordlist.txt')
